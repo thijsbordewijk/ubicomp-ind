@@ -1,0 +1,53 @@
+#include <Servo.h> 
+#include <elapsedMillis.h>
+Servo myservo1;
+elapsedMillis teller1;
+int pos = 0; 
+int piezoPin = D5;  
+
+
+void setup() {
+  myservo1.attach(D7);
+  pinMode(LED_BUILTIN, OUTPUT); 
+  Serial.begin(115200);
+}
+ 
+void loop() {
+    int sensorValue = analogRead(A0);
+    
+if (sensorValue <= 150) {
+  Serial.println(teller1);
+ Serial.println("LICHT UIT!"); //Hier maak ik het makkelijker af te lezen in de serial monitor wanneer de sensor merkt dat het licht uit is gegaan.
+}
+else {
+   Serial.println("LICHT AAN :-(");
+   teller1 = 0;
+   tone(piezoPin, 300, 400);
+   delay(150);
+   tone(piezoPin, 250, 400);
+   delay(150);
+   tone(piezoPin, 150, 400);
+   delay(1000);//Deze piezo tonen maken het verdrietige geluidje dat gemaakt wordt wanneer het licht aanstaat.
+   teller1 = 0;
+}
+  if (teller1 > 10000) {
+   tone(piezoPin, 250, 400);
+   delay(150);
+   tone(piezoPin, 350, 400);
+   delay(150);
+   tone(piezoPin, 400, 400);
+   delay(150);
+   tone(piezoPin, 500, 600);//Deze Piezo tonen maken het vrolijke geluidje wanneer het licht de hele dag(10 sec) uit is geweest. 
+   
+   for (pos = 0; pos <= 110; pos += 1) {     
+    myservo1.write(pos);              
+    delay(3); //Deze beweging van de servomotor maakt het deurtje open                      
+  }
+  for (pos = 110; pos >= 0; pos -= 1) { 
+    myservo1.write(pos);              
+    delay(300); //Deze delay zorgt ervoor dat het deurtje heel langzaam dichtgaat, dit duurt ongeveer 33 seconden.                    
+  }
+  teller1 = 0;
+  }
+}
+  
